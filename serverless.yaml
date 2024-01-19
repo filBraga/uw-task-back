@@ -31,8 +31,8 @@ provider:
     lambda: true
   environment:
     NODE_ENV: ${opt:stage, 'dev'}
-    DB_NAME: Upworddatabase
-    DB_USERNAME: db_${self:service}_${opt:stage}
+    DB_NAME: ${env:DB_NAME}
+    DB_USERNAME: ${env:DB_USERNAME}
     DB_PASSWORD: ${env:DB_PASSWORD}
     DB_PORT:
       Fn::GetAtt: [RDSInstance, Endpoint.Port]
