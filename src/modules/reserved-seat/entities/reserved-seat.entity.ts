@@ -11,7 +11,7 @@ import {
 import { Hall } from '../../hall/entities/hall.entity';
 
 @Entity()
-export class ResearvedSeats {
+export class ReservedSeats {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -30,7 +30,7 @@ export class ResearvedSeats {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToOne(() => Hall, (hall) => hall.researvedSeats)
+  @ManyToOne(() => Hall, (hall) => hall.ReservedSeats)
   @JoinColumn({ name: 'hallId' })
   hall: Hall;
 }

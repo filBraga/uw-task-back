@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Cinema } from '../../cinema/entities/cinema.entity';
-import { ResearvedSeats } from '../../reserved-seat/entities/reserved-seat.entity';
+import { ReservedSeats } from '../../reserved-seat/entities/reserved-seat.entity';
 
 @Entity('hall')
 export class Hall {
@@ -36,7 +36,7 @@ export class Hall {
   @JoinColumn({ name: 'cinemaId' })
   cinema: Cinema;
 
-  @OneToMany(() => ResearvedSeats, (researvedSeats) => researvedSeats.hall)
+  @OneToMany(() => ReservedSeats, (ReservedSeats) => ReservedSeats.hall)
   @JoinColumn({ name: 'hallId' })
-  researvedSeats: ResearvedSeats[];
+  ReservedSeats: ReservedSeats[];
 }
