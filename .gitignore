@@ -1,6 +1,9 @@
 # compiled output
 /dist
 /node_modules
+.build
+.warmup
+.serverless
 
 # Logs
 logs
