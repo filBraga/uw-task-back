@@ -11,8 +11,23 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
-    environment:
-      name: env
+
+    environment: dev
+    env:
+      DB_USERNAME: ${{ vars.DB_USERNAME }}
+      DB_NAME: ${{ vars.DB_NAME }}
+      DB_HOST: ${{ vars.DB_HOST }}
+      DB_PASSWORD: ${{ vars.DB_PASSWORD }}
+      DB_PORT: ${{ vars.DB_PORT }}
+      DB_SIZE: ${{ vars.DB_SIZE }}
+      DB_STORAGE: ${{ vars.DB_STORAGE }}
+      DB_MAX_STORAGE: ${{ vars.DB_MAX_STORAGE }}
+      MULTI_AZ: ${{ vars.MULTI_AZ }}
+      PERFORMANCE_INSIGHTS: ${{ vars.PERFORMANCE_INSIGHTS }}
+      MONITORING_INTERVAL: ${{ vars.MONITORING_INTERVAL }}
+      LOG_RETENTION_DAYS: ${{ vars.LOG_RETENTION_DAYS }}
+      LAMBDA_MEMORY_SIZE: ${{ vars.LAMBDA_MEMORY_SIZE }}
+
     steps:
       - uses: actions/checkout@v3
 
