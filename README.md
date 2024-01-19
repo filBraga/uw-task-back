@@ -49,3 +49,15 @@ Postgres
 ## ORM choice: TypeORM
 
 TypeORM
+
+## IaC choice: Serverless Framework
+
+Serverless Framework
+
+## Cloud choice: AWS
+
+AWS
+
+## CI/CD choice: Github Actions
+
+Github Actions
