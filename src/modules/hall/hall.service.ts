@@ -1,15 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { CreateHallDto } from './dto/create-hall.dto';
 import { UpdateHallDto } from './dto/update-hall.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Hall } from './entities/hall.entity';
+import { Cinema } from '../cinema/entities/cinema.entity';
 
 @Injectable()
 export class HallService {
-  create(createHallDto: CreateHallDto) {
-    return 'This action adds a new hall';
+  constructor(
+    @InjectRepository(Hall)
+    private hallRepository: Repository<Hall>,
+
+    @InjectRepository(Cinema)
+    private cinemaRepository: Repository<Cinema>,
+  ) {}
+
+  async create(createHallDto: CreateHallDto) {
+    const hallCreated = this.hallRepository.create(createHallDto);
+    return this.hallRepository.save(hallCreated);
   }
 
   findAll() {
-    return `This action returns all hall`;
+    return this.hallRepository.find();
   }
 
   findOne(id: number) {

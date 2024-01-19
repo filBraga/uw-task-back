@@ -36,7 +36,6 @@ export class Hall {
   @JoinColumn({ name: 'cinemaId' })
   cinema: Cinema;
 
-  @OneToMany(() => ReservedSeats, (ReservedSeats) => ReservedSeats.hall)
-  @JoinColumn({ name: 'hallId' })
+  @OneToMany(() => ReservedSeats, (reservedSeats) => reservedSeats.hall)
   ReservedSeats: ReservedSeats[];
 }
