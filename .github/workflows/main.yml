@@ -4,6 +4,9 @@ on:
     branches:
       - main
 
+env:
+  NAME: 'env'
+
 jobs:
   deploy:
     name: Continuous Integration

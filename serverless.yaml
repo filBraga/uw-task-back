@@ -21,27 +21,27 @@ provider:
       - 'image/jpeg'
       - 'image/heif'
       - 'multipart/form-data'
-  # logRetentionInDays: ${env:LOG_RETENTION_DAYS}
-  # memorySize: ${env:LAMBDA_MEMORY_SIZE} # Default memory size for functions (default: 1024MB)
+  logRetentionInDays: ${env:LOG_RETENTION_DAYS}
+  memorySize: ${env:LAMBDA_MEMORY_SIZE} # Default memory size for functions (default: 1024MB)
   logs:
     restApi:
       level: INFO # Log level to use for execution logging: INFO or ERROR
   tracing: # AWS X-Ray
     apiGateway: true
     lambda: true
-  # environment: ADDED ONLY THE FIRST DEPLOY
-  #   NODE_ENV: ${opt:stage, 'dev'}
-  #   DB_NAME: db_${self:service}_${opt:stage}
-  #   DB_USERNAME: db_${self:service}_${opt:stage}
-  #   DB_PASSWORD: ${env:DB_PASSWORD}
-  #   DB_PORT:
-  #     Fn::GetAtt: [RDSInstance, Endpoint.Port]
-  #   DB_SIZE: ${env:DB_SIZE}
-  #   DB_STORAGE: ${env:DB_STORAGE}
-  #   DB_MAX_STORAGE: ${env:DB_MAX_STORAGE}
-  #   MULTI_AZ: ${env:MULTI_AZ}
-  #   PERFORMANCE_INSIGHTS: ${env:PERFORMANCE_INSIGHTS}
-  #   MONITORING_INTERVAL: ${env:MONITORING_INTERVAL}
+  environment:
+    NODE_ENV: ${opt:stage, 'dev'}
+    DB_NAME: db_${self:service}_${opt:stage}
+    DB_USERNAME: db_${self:service}_${opt:stage}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+    DB_PORT:
+      Fn::GetAtt: [RDSInstance, Endpoint.Port]
+    DB_SIZE: ${env:DB_SIZE}
+    DB_STORAGE: ${env:DB_STORAGE}
+    DB_MAX_STORAGE: ${env:DB_MAX_STORAGE}
+    MULTI_AZ: ${env:MULTI_AZ}
+    PERFORMANCE_INSIGHTS: ${env:PERFORMANCE_INSIGHTS}
+    MONITORING_INTERVAL: ${env:MONITORING_INTERVAL}
 
 custom:
   serverlessPluginTypescript: # Typescript plugin
@@ -70,4 +70,4 @@ functions:
           path: /{proxy+}
 
 resources:
-  # - ${file(aws/rds.yml)} ADDED ONLY THE FIRST DEPLOY
+  - ${file(aws/rds.yml)}
