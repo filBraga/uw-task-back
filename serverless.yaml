@@ -1,0 +1,73 @@
+service: upwork-task
+frameworkVersion: '3'
+useDotenv: true
+
+plugins:
+  - serverless-plugin-typescript # Serverless plugin for zero-config Typescript support
+  - serverless-offline # Emulates AWS λ and API Gateway on your local machine
+  - serverless-content-encoding # A serverless plugin to enable Content Encoding feature in API Gateway for lambda function response compression
+  - serverless-plugin-warmup-ts-bridge-v2 # The library resolves a warmup and typescript issue
+  - serverless-plugin-warmup # WarmUp solves cold starts
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  endpointType: regional # Endpoint type for API Gateway REST API: edge or regional (default: edge)
+  apiName: api-${self:service}-${opt:stage}
+  apiGateway:
+    binaryMediaTypes: # Optional binary media types the API might return (e.g. image/png)
+      - 'image/png'
+      - 'image/jpeg'
+      - 'image/heif'
+      - 'multipart/form-data'
+  logRetentionInDays: ${env:LOG_RETENTION_DAYS}
+  memorySize: ${env:LAMBDA_MEMORY_SIZE} # Default memory size for functions (default: 1024MB)
+  logs:
+    restApi:
+      level: INFO # Log level to use for execution logging: INFO or ERROR
+  tracing: # AWS X-Ray
+    apiGateway: true
+    lambda: true
+  environment:
+    NODE_ENV: ${opt:stage, 'dev'}
+    DB_NAME: db_${self:service}_${opt:stage}
+    DB_USERNAME: db_${self:service}_${opt:stage}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+    DB_PORT:
+      Fn::GetAtt: [RDSInstance, Endpoint.Port]
+    DB_SIZE: ${env:DB_SIZE}
+    DB_STORAGE: ${env:DB_STORAGE}
+    DB_MAX_STORAGE: ${env:DB_MAX_STORAGE}
+    MULTI_AZ: ${env:MULTI_AZ}
+    PERFORMANCE_INSIGHTS: ${env:PERFORMANCE_INSIGHTS}
+    MONITORING_INTERVAL: ${env:MONITORING_INTERVAL}
+
+custom:
+  serverlessPluginTypescript: # Typescript plugin
+    tsConfigFileLocation: './tsconfig.build.json' # Override what tsconfig.json to use with the following snippet in your severless.yaml
+  # warmup: # WarmUp plugin
+  #   default: # Supports creating one or more warmer function
+  #     enabled: true # Whether to warm up functions by default or not
+  #     prewarm: true # Run WarmUp immediately after a deploymentlambda
+
+package:
+  individually: true
+  exclude:
+    - '!venv/**'
+    - '!env/**'
+    - '!.build/**'
+    - '!node_modules/@types/**'
+    - '!node_modules/typescript/**'
+    - '!node_modules/serverless**/**'
+
+functions:
+  main:
+    handler: lambda.handler
+    events:
+      - http:
+          method: any
+          path: /{proxy+}
+
+resources:
+  - ${file(aws/rds.yml)}
