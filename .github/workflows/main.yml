@@ -4,6 +4,9 @@ on:
     branches:
       - main
 
+environment:
+  name: env
+
 jobs:
   deploy:
     name: Continuous Integration
@@ -11,8 +14,6 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
-    env:
-      NAME: 'env'
     steps:
       - uses: actions/checkout@v3
 
