@@ -1,0 +1,42 @@
+name: Workflow API
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+
+      - name: Setting Aws keys
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.ACCESS_KEY }} --profile default
+          aws configure set aws_secret_access_key ${{ secrets.SECRET_ACCESS_KEY }} --profile default
+
+      - name: Serverless Deploy
+        if: github.ref == 'refs/heads/main'
+        run: |
+          npx serverless deploy --stage dev
