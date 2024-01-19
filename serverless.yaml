@@ -33,6 +33,7 @@ provider:
     NODE_ENV: ${opt:stage, 'dev'}
     DB_NAME: ${env:DB_NAME}
     DB_USERNAME: ${env:DB_USERNAME}
+    DB_HOST: ${env:DB_HOST}
     DB_PASSWORD: ${env:DB_PASSWORD}
     DB_PORT:
       Fn::GetAtt: [RDSInstance, Endpoint.Port]
@@ -42,6 +43,8 @@ provider:
     MULTI_AZ: ${env:MULTI_AZ}
     PERFORMANCE_INSIGHTS: ${env:PERFORMANCE_INSIGHTS}
     MONITORING_INTERVAL: ${env:MONITORING_INTERVAL}
+    LOG_RETENTION_DAYS: ${env:LOG_RETENTION_DAYS}
+    LAMBDA_MEMORY_SIZE: ${env:LAMBDA_MEMORY_SIZE}
 
 custom:
   serverlessPluginTypescript: # Typescript plugin
