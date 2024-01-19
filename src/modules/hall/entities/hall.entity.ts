@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Cinema } from '../../cinema/entities/cinema.entity';
-import { ResearvedSeats } from '../../reservedSeats/entities/reservedSeats.entity';
+import { ResearvedSeats } from '../../reserved-seat/entities/reserved-seat.entity';
 
 @Entity('hall')
 export class Hall {

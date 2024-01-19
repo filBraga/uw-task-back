@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CinemaModule } from './modules/cinema/cinema.module';
 import { ConfigModule } from '@nestjs/config';
 import { HallModule } from './modules/hall/hall.module';
+import { ReservedSeatModule } from './modules/reserved-seat/reserved-seat.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { HallModule } from './modules/hall/hall.module';
     }),
     CinemaModule,
     HallModule,
+    ReservedSeatModule,
   ],
 })
 export class AppModule {}

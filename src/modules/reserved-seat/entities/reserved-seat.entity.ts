@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -9,10 +10,16 @@ import {
 } from 'typeorm';
 import { Hall } from '../../hall/entities/hall.entity';
 
-@Entity('cinema')
+@Entity()
 export class ResearvedSeats {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  xAxis: number;
+
+  @Column()
+  yAxis: number;
 
   @CreateDateColumn()
   createdAt: Date;
