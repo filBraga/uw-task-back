@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CinemaModule } from './modules/cinema/cinema.module';
 import { ConfigModule } from '@nestjs/config';
+import { HallModule } from './modules/hall/hall.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
       synchronize: true, // do not use in prod
     }),
     CinemaModule,
+    HallModule,
   ],
 })
 export class AppModule {}
