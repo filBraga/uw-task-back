@@ -19,7 +19,6 @@ export class Cinema {
   name: string;
 
   @OneToMany(() => Hall, (hall) => hall.cinema)
-  @JoinColumn({ name: 'hallId' })
   halls: Hall[];
 
   @CreateDateColumn()
