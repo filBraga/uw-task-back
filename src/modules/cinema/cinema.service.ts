@@ -9,7 +9,7 @@ export class CinemaService {
   }
 
   findAll() {
-    return `This action returns all cinema`;
+    return `This action returns all cinema updated`;
   }
 
   findOne(id: number) {
