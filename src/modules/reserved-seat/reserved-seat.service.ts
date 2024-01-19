@@ -1,11 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReservedSeatDto } from './dto/create-reserved-seat.dto';
 import { UpdateReservedSeatDto } from './dto/update-reserved-seat.dto';
+import { ReservedSeats } from './entities/reserved-seat.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ReservedSeatService {
+  constructor(
+    @InjectRepository(ReservedSeats)
+    private reservedSeatsRepository: Repository<ReservedSeats>,
+  ) {}
+
   create(createReservedSeatDto: CreateReservedSeatDto) {
-    return 'This action adds a new reservedSeat';
+    try {
+      const reservedSeatCreated = this.reservedSeatsRepository.create(
+        createReservedSeatDto,
+      );
+      return this.reservedSeatsRepository.save(reservedSeatCreated);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   findAll() {
