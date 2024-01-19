@@ -21,8 +21,8 @@ provider:
       - 'image/jpeg'
       - 'image/heif'
       - 'multipart/form-data'
-  logRetentionInDays: ${env:LOG_RETENTION_DAYS}
-  memorySize: ${env:LAMBDA_MEMORY_SIZE} # Default memory size for functions (default: 1024MB)
+  # logRetentionInDays: ${env:LOG_RETENTION_DAYS}
+  # memorySize: ${env:LAMBDA_MEMORY_SIZE} # Default memory size for functions (default: 1024MB)
   logs:
     restApi:
       level: INFO # Log level to use for execution logging: INFO or ERROR
@@ -70,4 +70,4 @@ functions:
           path: /{proxy+}
 
 resources:
-  - ${file(aws/rds.yml)}
+  # - ${file(aws/rds.yml)} ADDED ONLY THE FIRST DEPLOY
