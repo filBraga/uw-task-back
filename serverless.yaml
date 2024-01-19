@@ -31,7 +31,7 @@ provider:
     lambda: true
   environment:
     NODE_ENV: ${opt:stage, 'dev'}
-    DB_NAME: db_${self:service}_${opt:stage}
+    DB_NAME: Upworddatabase
     DB_USERNAME: db_${self:service}_${opt:stage}
     DB_PASSWORD: ${env:DB_PASSWORD}
     DB_PORT:
