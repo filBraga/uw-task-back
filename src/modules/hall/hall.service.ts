@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateHallDto } from './dto/create-hall.dto';
-import { UpdateHallDto } from './dto/update-hall.dto';
+// import { UpdateHallDto } from './dto/update-hall.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Hall } from './entities/hall.entity';
@@ -26,12 +26,12 @@ export class HallService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} hall`;
+    return this.hallRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateHallDto: UpdateHallDto) {
-    return `This action updates a #${id} hall`;
-  }
+  // update(id: number, updateHallDto: UpdateHallDto) {
+  //   return `This action updates a #${id} hall`;
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} hall`;

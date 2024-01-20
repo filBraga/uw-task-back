@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCinemaDto } from './dto/create-cinema.dto';
-import { UpdateCinemaDto } from './dto/update-cinema.dto';
+// import { UpdateCinemaDto } from './dto/update-cinema.dto';
 import { Cinema } from './entities/cinema.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,9 +25,9 @@ export class CinemaService {
     return `This action returns a #${id} cinema`;
   }
 
-  update(id: number, updateCinemaDto: UpdateCinemaDto) {
-    return `This action updates a #${id} cinema`;
-  }
+  // update(id: number, updateCinemaDto: UpdateCinemaDto) {
+  //   return `This action updates a #${id} cinema`;
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} cinema`;
