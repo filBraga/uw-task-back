@@ -39,6 +39,11 @@ export class ReservedSeatController {
     return this.reservedSeatService.findAll();
   }
 
+  @Get('hall/:id')
+  findAllByHall(@Param('id') id: string) {
+    return this.reservedSeatService.findAllByHall(+id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.reservedSeatService.findOne(+id);

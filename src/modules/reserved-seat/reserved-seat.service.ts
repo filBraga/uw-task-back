@@ -49,74 +49,6 @@ export class ReservedSeatService {
     return `This action removes a #${id} reservedSeat`;
   }
 
-  async getNextAvailableTicket1(hallId, xAxis, yAxis) {
-    const hall = await this.hallRepository.findOne({ where: { id: hallId } });
-
-    if (!hall) {
-      return 'Hall not found';
-    }
-
-    if (xAxis > hall.xAxis || yAxis > hall.yAxis) {
-      return 'Seat out of bound';
-    }
-
-    const reservedSeats = await this.reservedSeatsRepository.find({
-      where: { hall: hallId },
-    });
-
-    const arrayOfArray = [];
-
-    for (let i = 0; i < hall.xAxis; i++) {
-      arrayOfArray.push([]);
-      for (let j = 0; j < hall.yAxis; j++) {
-        arrayOfArray[i].push(0);
-      }
-    }
-
-    reservedSeats.forEach((reservedSeat) => {
-      arrayOfArray[reservedSeat.xAxis][reservedSeat.yAxis] = 1;
-      arrayOfArray[reservedSeat.xAxis][reservedSeat.yAxis + 1] = 1;
-      arrayOfArray[reservedSeat.xAxis + 1][reservedSeat.yAxis] = 1;
-      arrayOfArray[reservedSeat.xAxis][reservedSeat.yAxis - 1] = 1;
-      arrayOfArray[reservedSeat.xAxis - 1][reservedSeat.yAxis] = 1;
-    });
-
-    if (arrayOfArray[xAxis][yAxis] === 0) {
-      return { xAxis, yAxis };
-    }
-
-    const centralPoint = [Math.ceil(hall.xAxis / 2), Math.ceil(hall.yAxis / 2)];
-
-    const xDirection = xAxis > centralPoint[0] ? -1 : 1;
-    const yDirection = yAxis > centralPoint[1] ? -1 : 1;
-
-    for (let i = 0; true; i++) {
-      const newX = xAxis + i * xDirection; // 2 = 1 + 1 * 1
-      const newY = yAxis + i * yDirection; // 2 = 1 + 1 * 1
-
-      if (checkIfSeatEmpty(arrayOfArray, newX, newY)) {
-        return {
-          xAxis: newX,
-          yAxis: newY,
-        };
-      }
-
-      if (checkIfSeatEmpty(arrayOfArray, newX + xDirection, newY)) {
-        return {
-          xAxis: newX + xDirection,
-          yAxis: newY,
-        };
-      }
-
-      if (checkIfSeatEmpty(arrayOfArray, newX, newY + yDirection)) {
-        return {
-          xAxis: newX,
-          yAxis: newY + yDirection,
-        };
-      }
-    }
-  }
-
   async getNextAvailableTicket(hallId, xAxis, yAxis) {
     const hall = await this.hallRepository.findOne({ where: { id: hallId } });
 
@@ -250,5 +182,34 @@ export class ReservedSeatService {
         },
       );
     }
+  }
+
+  async findAllByHall(hallId) {
+    const hall = await this.hallRepository.findOne({ where: { id: hallId } });
+
+    const reservedSeats = await this.reservedSeatsRepository
+      .createQueryBuilder('reservedSeat')
+      .leftJoinAndSelect('reservedSeat.hall', 'hall')
+      .where('hall.id = :hallId', { hallId })
+      .getMany();
+
+    const arrayOfArray = [];
+
+    for (let i = 0; i < hall.xAxis; i++) {
+      arrayOfArray.push([]);
+      for (let j = 0; j < hall.yAxis; j++) {
+        arrayOfArray[i].push(0);
+      }
+    }
+
+    reservedSeats.forEach((reservedSeat) => {
+      arrayOfArray[reservedSeat.xAxis][reservedSeat.yAxis] = 1;
+      arrayOfArray[reservedSeat.xAxis][reservedSeat.yAxis + 1] = 1;
+      arrayOfArray[reservedSeat.xAxis + 1][reservedSeat.yAxis] = 1;
+      arrayOfArray[reservedSeat.xAxis][reservedSeat.yAxis - 1] = 1;
+      arrayOfArray[reservedSeat.xAxis - 1][reservedSeat.yAxis] = 1;
+    });
+
+    return arrayOfArray;
   }
 }
