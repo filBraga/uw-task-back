@@ -5,6 +5,11 @@ import { ReservedSeats } from './entities/reserved-seat.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hall } from '../hall/entities/hall.entity';
+import {
+  addOneToFurthestAxis,
+  checkIfSeatEmpty,
+  checkIfSeatOnCentral,
+} from '../../utils';
 
 @Injectable()
 export class ReservedSeatService {
@@ -43,7 +48,7 @@ export class ReservedSeatService {
     return `This action removes a #${id} reservedSeat`;
   }
 
-  async getNextAvailableTicket(hallId, xAxis, yAxis) {
+  async getNextAvailableTicket1(hallId, xAxis, yAxis) {
     const hall = await this.hallRepository.findOne({ where: { id: hallId } });
 
     if (!hall) {
@@ -76,7 +81,7 @@ export class ReservedSeatService {
     });
 
     if (arrayOfArray[xAxis][yAxis] === 0) {
-      return { availableSeat: { xAxis, yAxis } };
+      return { xAxis, yAxis };
     }
 
     const centralPoint = [Math.ceil(hall.xAxis / 2), Math.ceil(hall.yAxis / 2)];
@@ -85,76 +90,192 @@ export class ReservedSeatService {
     const yDirection = yAxis > centralPoint[1] ? -1 : 1;
 
     for (let i = 0; true; i++) {
-      const checkSeatPositionBaseX = xAxis + i * xDirection; // 2 = 1 + 1 * 1
-      const checkSeatPositionBaseY = yAxis + i * yDirection; // 2 = 1 + 1 * 1
+      const newX = xAxis + i * xDirection; // 2 = 1 + 1 * 1
+      const newY = yAxis + i * yDirection; // 2 = 1 + 1 * 1
 
       // check the base line
-      if (
-        arrayOfArray[checkSeatPositionBaseX][checkSeatPositionBaseY] === 0 // [2][2] === 0  false
-      ) {
+      if (checkIfSeatEmpty(arrayOfArray, newX, newY)) {
         return {
-          availableSeat: {
-            xAxis: checkSeatPositionBaseX,
-            yAxis: checkSeatPositionBaseY,
-          },
+          xAxis: newX,
+          yAxis: newY,
         };
       }
 
       // check + 1 in the x
-      if (
-        arrayOfArray[checkSeatPositionBaseX + xDirection][
-          checkSeatPositionBaseY
-        ] === 0 // [3][2] === 0  true
-      ) {
-        console.log('hereeeee');
-
+      if (checkIfSeatEmpty(arrayOfArray, newX + xDirection, newY)) {
         return {
-          availableSeat: {
-            xAxis: checkSeatPositionBaseX + xDirection,
-            yAxis: checkSeatPositionBaseY,
-          },
+          xAxis: newX + xDirection,
+          yAxis: newY,
         };
       }
 
       // check + 1 in the y
-      if (
-        arrayOfArray[checkSeatPositionBaseX][
-          checkSeatPositionBaseY + yDirection
-        ] === 0
-      ) {
+      if (checkIfSeatEmpty(arrayOfArray, newX, newY + yDirection)) {
         return {
-          availableSeat: {
-            xAxis: checkSeatPositionBaseX,
-            yAxis: checkSeatPositionBaseY + yDirection,
-          },
+          xAxis: newX,
+          yAxis: newY + yDirection,
         };
       }
+    }
+  }
 
-      // if (
-      //   arrayOfArray[checkSeatPositionBaseX - xDirection][
-      //     checkSeatPositionBaseY
-      //   ] === 0
-      // ) {
-      //   return {
-      //     availableSeat: {
-      //       xAxis: checkSeatPositionBaseX - xDirection,
-      //       yAxis: checkSeatPositionBaseY,
-      //     },
-      //   };
-      // }
+  async getNextAvailableTicket(hallId, xAxis, yAxis) {
+    const hall = await this.hallRepository.findOne({ where: { id: hallId } });
 
-      // if (
-      //   arrayOfArray[checkSeatPositionBaseX][
-      //     checkSeatPositionBaseY - yDirection
-      //   ] === 0
-      // ) {
-      //   return {
-      //     availableSeat: {
-      //       xAxis: checkSeatPositionBaseX,
-      //       yAxis: checkSeatPositionBaseY - yDirection,
-      //     },
-      //   };
-      // }
+    xAxis = xAxis !== null ? xAxis : Math.floor(hall.xAxis / 2);
+    yAxis = yAxis !== null ? yAxis : Math.floor(hall.yAxis / 2);
+
+    const reservedSeats = await this.reservedSeatsRepository.find({
+      where: { hall: hallId },
+    });
+
+    const hallSeats = [];
+
+    for (let i = 0; i < hall.xAxis; i++) {
+      hallSeats.push([]);
+      for (let j = 0; j < hall.yAxis; j++) {
+        hallSeats[i].push(0);
+      }
+    }
+
+    reservedSeats.forEach((reservedSeat) => {
+      hallSeats[reservedSeat.xAxis][reservedSeat.yAxis] = 1;
+      hallSeats[reservedSeat.xAxis][reservedSeat.yAxis + 1] = 1;
+      hallSeats[reservedSeat.xAxis + 1][reservedSeat.yAxis] = 1;
+      hallSeats[reservedSeat.xAxis][reservedSeat.yAxis - 1] = 1;
+      hallSeats[reservedSeat.xAxis - 1][reservedSeat.yAxis] = 1;
+    });
+
+    // Check if selected seat is empty
+
+    console.log(hallSeats);
+
+    if (hallSeats[xAxis][yAxis] === 0) {
+      return { position: { x: xAxis, y: yAxis } };
+    }
+
+    // Define the central point
+
+    const centralPoint = {
+      x:
+        xAxis > hall.xAxis / 2
+          ? Math.ceil(hall.xAxis / 2)
+          : Math.floor(hall.xAxis / 2),
+      y:
+        yAxis > hall.yAxis / 2
+          ? Math.ceil(hall.yAxis / 2)
+          : Math.floor(hall.yAxis / 2),
+    };
+
+    type positionChecked = {
+      position: { x: number; y: number };
+      isGoingToCenter?: boolean;
+    };
+
+    const nextPositionsToBeChecked: positionChecked[] = [];
+
+    nextPositionsToBeChecked.push({
+      position: { x: xAxis, y: yAxis },
+      isGoingToCenter: true,
+    });
+
+    while (xAxis && yAxis && nextPositionsToBeChecked.length) {
+      const positionChecked = nextPositionsToBeChecked.shift();
+      if (
+        checkIfSeatEmpty(
+          hallSeats,
+          positionChecked.position.x,
+          positionChecked.position.y,
+        )
+      )
+        return positionChecked;
+
+      if (checkIfSeatOnCentral(centralPoint, positionChecked)) break;
+
+      const nextDirection = addOneToFurthestAxis(centralPoint, positionChecked);
+
+      if (positionChecked.isGoingToCenter) {
+        nextPositionsToBeChecked.push({
+          position: {
+            x: positionChecked.position.x + nextDirection.x,
+            y: positionChecked.position.y + nextDirection.y,
+          },
+          isGoingToCenter: true,
+        });
+      }
+    }
+
+    // got to center and did not find any empty seats or not defined preffered seat
+
+    const nextPositionsToBeCheckedCentral: positionChecked[] = [];
+
+    nextPositionsToBeCheckedCentral.push({
+      position: {
+        x: centralPoint.x,
+        y: centralPoint.y,
+      },
+      isGoingToCenter: false,
+    });
+
+    console.log(nextPositionsToBeCheckedCentral);
+
+    // no defined seat logic
+
+    const checkedSeats = {};
+    const getSeatKey = ({ x, y }) => 'x:' + x + 'y:' + y;
+
+    while (true) {
+      console.log(nextPositionsToBeCheckedCentral);
+
+      const positionChecked = nextPositionsToBeCheckedCentral.shift();
+
+      if (positionChecked.position.x > hall.xAxis) continue;
+      if (positionChecked.position.y > hall.yAxis) continue;
+
+      if (positionChecked.position.x < 0) continue;
+      if (positionChecked.position.y < 0) continue;
+
+      if (checkedSeats[getSeatKey(positionChecked.position)]) continue;
+      checkedSeats[getSeatKey(positionChecked.position)] = true;
+
+      if (
+        checkIfSeatEmpty(
+          hallSeats,
+          positionChecked.position.x,
+          positionChecked.position.y,
+        )
+      ) {
+        return positionChecked;
+      }
+
+      // TODO: check if out of bounds
+
+      nextPositionsToBeCheckedCentral.push(
+        {
+          position: {
+            x: positionChecked.position.x + 1,
+            y: positionChecked.position.y,
+          },
+        },
+        {
+          position: {
+            x: positionChecked.position.x,
+            y: positionChecked.position.y + 1,
+          },
+        },
+        {
+          position: {
+            x: positionChecked.position.x - 1,
+            y: positionChecked.position.y,
+          },
+        },
+        {
+          position: {
+            x: positionChecked.position.x,
+            y: positionChecked.position.y - 1,
+          },
+        },
+      );
     }
   }
 }
