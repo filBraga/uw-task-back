@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReservedSeatDto } from './dto/create-reserved-seat.dto';
-import { UpdateReservedSeatDto } from './dto/update-reserved-seat.dto';
+// import { UpdateReservedSeatDto } from './dto/update-reserved-seat.dto';
 import { ReservedSeats } from './entities/reserved-seat.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +10,7 @@ import {
   checkIfSeatEmpty,
   checkIfSeatOnCentral,
 } from '../../utils';
+import { positionChecked } from '../types';
 
 @Injectable()
 export class ReservedSeatService {
@@ -40,9 +41,9 @@ export class ReservedSeatService {
     return `This action returns a #${id} reservedSeat`;
   }
 
-  update(id: number, updateReservedSeatDto: UpdateReservedSeatDto) {
-    return `This action updates a #${id} reservedSeat`;
-  }
+  // update(id: number, updateReservedSeatDto: UpdateReservedSeatDto) {
+  //   return `This action updates a #${id} reservedSeat`;
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} reservedSeat`;
@@ -93,7 +94,6 @@ export class ReservedSeatService {
       const newX = xAxis + i * xDirection; // 2 = 1 + 1 * 1
       const newY = yAxis + i * yDirection; // 2 = 1 + 1 * 1
 
-      // check the base line
       if (checkIfSeatEmpty(arrayOfArray, newX, newY)) {
         return {
           xAxis: newX,
@@ -101,7 +101,6 @@ export class ReservedSeatService {
         };
       }
 
-      // check + 1 in the x
       if (checkIfSeatEmpty(arrayOfArray, newX + xDirection, newY)) {
         return {
           xAxis: newX + xDirection,
@@ -109,7 +108,6 @@ export class ReservedSeatService {
         };
       }
 
-      // check + 1 in the y
       if (checkIfSeatEmpty(arrayOfArray, newX, newY + yDirection)) {
         return {
           xAxis: newX,
@@ -146,16 +144,6 @@ export class ReservedSeatService {
       hallSeats[reservedSeat.xAxis - 1][reservedSeat.yAxis] = 1;
     });
 
-    // Check if selected seat is empty
-
-    console.log(hallSeats);
-
-    if (hallSeats[xAxis][yAxis] === 0) {
-      return { position: { x: xAxis, y: yAxis } };
-    }
-
-    // Define the central point
-
     const centralPoint = {
       x:
         xAxis > hall.xAxis / 2
@@ -167,20 +155,15 @@ export class ReservedSeatService {
           : Math.floor(hall.yAxis / 2),
     };
 
-    type positionChecked = {
-      position: { x: number; y: number };
-      isGoingToCenter?: boolean;
-    };
+    const positionsQueue: positionChecked[] = [];
 
-    const nextPositionsToBeChecked: positionChecked[] = [];
-
-    nextPositionsToBeChecked.push({
+    positionsQueue.push({
       position: { x: xAxis, y: yAxis },
       isGoingToCenter: true,
     });
 
-    while (xAxis && yAxis && nextPositionsToBeChecked.length) {
-      const positionChecked = nextPositionsToBeChecked.shift();
+    while (positionsQueue.length) {
+      const positionChecked = positionsQueue.shift();
       if (
         checkIfSeatEmpty(
           hallSeats,
@@ -195,7 +178,7 @@ export class ReservedSeatService {
       const nextDirection = addOneToFurthestAxis(centralPoint, positionChecked);
 
       if (positionChecked.isGoingToCenter) {
-        nextPositionsToBeChecked.push({
+        positionsQueue.push({
           position: {
             x: positionChecked.position.x + nextDirection.x,
             y: positionChecked.position.y + nextDirection.y,
@@ -205,11 +188,9 @@ export class ReservedSeatService {
       }
     }
 
-    // got to center and did not find any empty seats or not defined preffered seat
+    const positionsQueueCentral: positionChecked[] = [];
 
-    const nextPositionsToBeCheckedCentral: positionChecked[] = [];
-
-    nextPositionsToBeCheckedCentral.push({
+    positionsQueueCentral.push({
       position: {
         x: centralPoint.x,
         y: centralPoint.y,
@@ -217,17 +198,11 @@ export class ReservedSeatService {
       isGoingToCenter: false,
     });
 
-    console.log(nextPositionsToBeCheckedCentral);
-
-    // no defined seat logic
-
     const checkedSeats = {};
     const getSeatKey = ({ x, y }) => 'x:' + x + 'y:' + y;
 
     while (true) {
-      console.log(nextPositionsToBeCheckedCentral);
-
-      const positionChecked = nextPositionsToBeCheckedCentral.shift();
+      const positionChecked = positionsQueueCentral.shift();
 
       if (positionChecked.position.x > hall.xAxis) continue;
       if (positionChecked.position.y > hall.yAxis) continue;
@@ -248,9 +223,7 @@ export class ReservedSeatService {
         return positionChecked;
       }
 
-      // TODO: check if out of bounds
-
-      nextPositionsToBeCheckedCentral.push(
+      positionsQueueCentral.push(
         {
           position: {
             x: positionChecked.position.x + 1,
