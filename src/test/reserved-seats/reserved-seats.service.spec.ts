@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { Hall } from '../../modules/hall/entities/hall.entity';
 import { ReservedSeats } from '../../modules/reserved-seat/entities/reserved-seat.entity';
 import { ReservedSeatService } from '../../modules/reserved-seat/reserved-seat.service';
-describe('ReservedSeatController', () => {
+describe('ReservedSeatService', () => {
   let reservedSeatService: ReservedSeatService;
   let reservedSeatsRepository: Repository<ReservedSeats>;
   let hallRepository: Repository<Hall>;
@@ -72,10 +72,9 @@ describe('ReservedSeatController', () => {
       );
 
       expect(result).toEqual({
-        isGoingToCenter: true,
         position: {
-          x: 2,
-          y: 3,
+          x: 7,
+          y: 5,
         },
       });
 
