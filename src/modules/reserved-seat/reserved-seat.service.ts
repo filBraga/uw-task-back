@@ -49,21 +49,18 @@ export class ReservedSeatService {
     return `This action removes a #${id} reservedSeat`;
   }
 
-  async getNextAvailableTicket(hallId, xAxis, yAxis) {
+  async getNextAvailableTicket(hallId, xAxis = undefined, yAxis = undefined) {
     const hall = await this.hallRepository.findOne({ where: { id: hallId } });
 
-    console.log('findOne');
-    console.log(hall);
+    console.log('xAxis');
+    console.log(xAxis);
 
-    xAxis = xAxis !== null ? xAxis : Math.floor(hall.xAxis / 2);
-    yAxis = yAxis !== null ? yAxis : Math.floor(hall.yAxis / 2);
+    xAxis = xAxis ? xAxis : Math.floor(hall.xAxis / 2);
+    yAxis = yAxis ? yAxis : Math.floor(hall.yAxis / 2);
 
     const reservedSeats = await this.reservedSeatsRepository.find({
       where: { hall: hallId },
     });
-
-    console.log('find');
-    console.log(reservedSeats);
 
     const hallSeats = [];
 
@@ -96,12 +93,16 @@ export class ReservedSeatService {
     const positionsQueue: positionChecked[] = [];
 
     positionsQueue.push({
-      position: { x: +xAxis, y: +yAxis }, // adicionei o + para converter para number
+      position: { x: xAxis, y: yAxis }, // adicionei o PARSE INT
       isGoingToCenter: true,
     });
 
     while (positionsQueue.length) {
       const positionChecked = positionsQueue.shift();
+
+      console.log('positionChecked');
+      console.log(positionChecked);
+
       if (positionChecked.position.x > hall.xAxis) continue;
       if (positionChecked.position.y > hall.yAxis) continue;
 
