@@ -40,6 +40,8 @@ $ npm run test:cov
 
 ## Database choice: Postgres
 
+![DB](./db.png)
+
 Postgres in RDS
 Easier, managed deployments. Fast, predictable storage. Backup and recovery. High availability and read replicas.Isolation and security
 
