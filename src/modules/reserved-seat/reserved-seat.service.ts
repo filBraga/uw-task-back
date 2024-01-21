@@ -52,9 +52,6 @@ export class ReservedSeatService {
   async getNextAvailableTicket(hallId, xAxis = undefined, yAxis = undefined) {
     const hall = await this.hallRepository.findOne({ where: { id: hallId } });
 
-    console.log('xAxis');
-    console.log(xAxis);
-
     xAxis = xAxis ? xAxis : Math.floor(hall.xAxis / 2);
     yAxis = yAxis ? yAxis : Math.floor(hall.yAxis / 2);
 
@@ -99,9 +96,6 @@ export class ReservedSeatService {
 
     while (positionsQueue.length) {
       const positionChecked = positionsQueue.shift();
-
-      console.log('positionChecked');
-      console.log(positionChecked);
 
       if (positionChecked.position.x > hall.xAxis) continue;
       if (positionChecked.position.y > hall.yAxis) continue;
