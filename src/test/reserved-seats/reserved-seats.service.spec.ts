@@ -65,16 +65,13 @@ describe('ReservedSeatService', () => {
 
       jest.spyOn(reservedSeatService, 'getNextAvailableTicket'); // tive que adicionar essa aqui
 
-      const result = await reservedSeatService.getNextAvailableTicket(
-        '1',
-        '1',
-        '1',
-      );
+      const result = await reservedSeatService.getNextAvailableTicket(1, 1, 1);
 
       expect(result).toEqual({
+        isGoingToCenter: true,
         position: {
-          x: 7,
-          y: 5,
+          x: 2,
+          y: 3,
         },
       });
 
