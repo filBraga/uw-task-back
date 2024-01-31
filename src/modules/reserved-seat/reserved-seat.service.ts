@@ -70,10 +70,10 @@ export class ReservedSeatService {
 
     reservedSeats.forEach((reservedSeat) => {
       hallSeats[reservedSeat.xAxis][reservedSeat.yAxis] = 1;
-      hallSeats[reservedSeat.xAxis][reservedSeat.yAxis + 1] = 1;
-      hallSeats[reservedSeat.xAxis + 1][reservedSeat.yAxis] = 1;
       hallSeats[reservedSeat.xAxis][reservedSeat.yAxis - 1] = 1;
       hallSeats[reservedSeat.xAxis - 1][reservedSeat.yAxis] = 1;
+      hallSeats[reservedSeat.xAxis][reservedSeat.yAxis + 1] = 1;
+      hallSeats[reservedSeat.xAxis + 1][reservedSeat.yAxis] = 1;
     });
 
     const centralPoint = {
