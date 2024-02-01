@@ -52,8 +52,8 @@ export class ReservedSeatService {
   async getNextAvailableTicket(hallId, xAxis = undefined, yAxis = undefined) {
     const hall = await this.hallRepository.findOne({ where: { id: hallId } });
 
-    xAxis = xAxis ? xAxis : Math.floor(hall.xAxis / 2);
-    yAxis = yAxis ? yAxis : Math.floor(hall.yAxis / 2);
+    xAxis = xAxis || xAxis === 0 ? xAxis : Math.floor(hall.xAxis / 2);
+    yAxis = yAxis || yAxis === 0 ? yAxis : Math.floor(hall.yAxis / 2);
 
     const reservedSeats = await this.reservedSeatsRepository.find({
       where: { hall: hallId },
