@@ -165,14 +165,14 @@ export class ReservedSeatService {
       positionsQueueCentral.push(
         {
           position: {
-            x: positionChecked.position.x - 1,
-            y: positionChecked.position.y,
+            x: positionChecked.position.x,
+            y: positionChecked.position.y - 1,
           },
         },
         {
           position: {
-            x: positionChecked.position.x,
-            y: positionChecked.position.y - 1,
+            x: positionChecked.position.x - 1,
+            y: positionChecked.position.y,
           },
         },
         {
